@@ -41,6 +41,7 @@
 #include "hw/intc/riscv_imsic.h"
 #include "hw/intc/sifive_plic.h"
 #include "hw/misc/sifive_test.h"
+#include "hw/misc/custom_dev.h"
 #include "hw/platform-bus.h"
 #include "chardev/char.h"
 #include "sysemu/device_tree.h"
@@ -91,6 +92,7 @@ static const MemMapEntry virt_memmap[] = {
     [VIRT_ACLINT_SSWI] =  {  0x2F00000,        0x4000 },
     [VIRT_PCIE_PIO] =     {  0x3000000,       0x10000 },
     [VIRT_PLATFORM_BUS] = {  0x4000000,     0x2000000 },
+    [VIRT_CUSTOM_DEV]   = {  0x6000000,      0x100000 },
     [VIRT_PLIC] =         {  0xc000000, VIRT_PLIC_SIZE(VIRT_CPUS_MAX * 2) },
     [VIRT_APLIC_M] =      {  0xc000000, APLIC_SIZE(VIRT_CPUS_MAX) },
     [VIRT_APLIC_S] =      {  0xd000000, APLIC_SIZE(VIRT_CPUS_MAX) },
@@ -965,6 +967,25 @@ static void create_fdt_uart(RISCVVirtState *s, const MemMapEntry *memmap,
     qemu_fdt_setprop_string(ms->fdt, "/chosen", "stdout-path", name);
     g_free(name);
 }
+/*
+static void create_fdt_custom_dev(RISCVVirtState *s, const MemMapEntry *memmap,
+                            uint32_t irq_mmio_phandle)
+{
+    char *name;
+    MachineState *ms = MACHINE(s);
+
+    name = g_strdup_printf("/custom_dev@%lx", (long)memmap[VIRT_CUSTOM_DEV].base);
+    qemu_fdt_add_subnode(ms->fdt, name);
+    qemu_fdt_setprop_string(ms->fdt, name, "compatible", "custom_dev");
+    qemu_fdt_setprop_cells(ms->fdt, name, "reg",
+        0x0, memmap[VIRT_CUSTOM_DEV].base,
+        0x0, memmap[VIRT_CUSTOM_DEV].size);
+    qemu_fdt_setprop_cell(ms->fdt, name, "interrupt-parent",
+        irq_mmio_phandle);
+    qemu_fdt_setprop_cell(ms->fdt, name, "interrupts", CUSTOM_DEV_IRQ);
+    g_free(name);
+
+}*/
 
 static void create_fdt_rtc(RISCVVirtState *s, const MemMapEntry *memmap,
                            uint32_t irq_mmio_phandle)
@@ -1038,6 +1059,8 @@ static void finalize_fdt(RISCVVirtState *s)
     create_fdt_reset(s, virt_memmap, &phandle);
 
     create_fdt_uart(s, virt_memmap, irq_mmio_phandle);
+
+    //create_fdt_custom_dev(s, virt_memmap, irq_mmio_phandle);
 
     create_fdt_rtc(s, virt_memmap, irq_mmio_phandle);
 }
@@ -1509,6 +1532,9 @@ static void virt_machine_init(MachineState *machine)
 
     /* SiFive Test MMIO device */
     sifive_test_create(memmap[VIRT_TEST].base);
+
+    /* Custom device */
+    custom_dev_create(memmap[VIRT_CUSTOM_DEV].base);
 
     /* VirtIO MMIO devices */
     for (i = 0; i < VIRTIO_COUNT; i++) {

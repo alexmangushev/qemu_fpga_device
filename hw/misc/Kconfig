@@ -10,7 +10,10 @@ config ARMSSE_MHU
 
 config ARMSSE_CPU_PWRCTRL
     bool
-
+    
+config CUSTOM_DEV
+    bool
+    
 config ISA_DEBUG
     bool
     depends on ISA_BUS

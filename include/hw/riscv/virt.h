@@ -82,7 +82,8 @@ enum {
     VIRT_PCIE_MMIO,
     VIRT_PCIE_PIO,
     VIRT_PLATFORM_BUS,
-    VIRT_PCIE_ECAM
+    VIRT_PCIE_ECAM,
+    VIRT_CUSTOM_DEV
 };
 
 enum {
@@ -92,6 +93,7 @@ enum {
     VIRTIO_COUNT = 8,
     PCIE_IRQ = 0x20, /* 32 to 35 */
     VIRT_PLATFORM_BUS_IRQ = 64, /* 64 to 95 */
+    //CUSTOM_DEV_IRQ = 96,
 };
 
 #define VIRT_PLATFORM_BUS_NUM_IRQS 32
