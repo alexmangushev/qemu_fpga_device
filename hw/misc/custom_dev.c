@@ -27,10 +27,10 @@ struct CustomDevState {
 
 uint64_t data_exchange(uint64_t addr, uint64_t data, char wr)
 {
-    if (wr)
-        printf("\nWRITE: %lx %lx\n", addr, data);
-    else
-        printf("\nREAD: %lx\n", addr);
+    //if (wr)
+    //    printf("\nWRITE: %lx %lx\n", addr, data);
+    //else
+    //    printf("\nREAD: %lx\n", addr);
 
     // for socket part
     int socket_desc;
@@ -80,7 +80,7 @@ uint64_t data_exchange(uint64_t addr, uint64_t data, char wr)
 
         uint32_t rdata = 0;
         for (int i = 3, k = 0; i >= 0; i--, k++)
-            rdata |= (server_message[k] << (i * 8));
+            rdata |= ((uint8_t)server_message[k] << (i * 8));
         return rdata;
     }
 
